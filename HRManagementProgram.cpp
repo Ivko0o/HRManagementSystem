@@ -34,7 +34,7 @@ public:
 	}
 
 	void DisplayDetails() const {
-		std::cout << "Employee Details : \n";
+		std::cout << "Employee Details: \n";
 		std::cout << "Name: " << name << "\n";
 		std::cout << "Position: " << position << "\n";
 		std::cout << "Age: " << age << "\n";
@@ -61,6 +61,7 @@ public:
 		numberEmployees++;
 	}
 
+	//This will be used to validate that all EmployeeNumbers are unique
 	bool EmployeeNumberExists(int empNum) const {
 		return std::any_of(listEmployees.begin(), listEmployees.end(),
 			[empNum](const Employee& employee) {
@@ -74,6 +75,7 @@ public:
 			return;
 		}
 
+		//This is used to find the employee with the coresponding EmployeeNumber in the vector listEmployees and remove it
 		listEmployees.erase(std::remove_if(listEmployees.begin(),listEmployees.end(), [empNum](const Employee& employee) { return employee.getEmpNum() == empNum; }), listEmployees.end());
 
 			numberEmployees--;
@@ -130,26 +132,44 @@ int main() {
 			std::cin.ignore();
 		}
 
-		//Clears the cin stream;
 		std::cin.ignore();
 
 		switch (option) {
+		//Case 1 is taking the information about the employee
 		case 1:
 			std::cout << "\nEnter the name of new employee: \n";
 			std::getline(std::cin, name);
-			std::cout << "Enter position: \n";
+			std::cout << "\nEnter position of employee: \n";
 			std::getline(std::cin, position);
-			std::cout << "Enter age of employee: \n";
-			std::cin >> age;
 
-			std::cout << "Enter employee number(e.g 10001): \n";
+			//This validates that the age is entered in the correct format
+			std::cout << "\nEnter age of employee: \n";
 			while (true) {
-				std::cin >> employeeNumber;
-				if ((employeeNumber < minEmployeeNumber || employeeNumber > maxEmployeeNumber)) {
-					std::cout << "Invalid number format! Number must be in 5-digit format(e.g 10001)!\n";
+				std::cin >> age;
+				if (std::cin.fail()) {
+					std::cout << "Invalid format!\n";
 					std::cout << "Try again: ";
+					std::cin.clear();
+					std::cin.ignore();
 					continue;
 				}
+				break;
+			}
+
+			//This validates that the employee number does not repeat itself and it is in the right format
+			std::cout << "\nEnter employee number(e.g 10001): \n";
+			while (true) {
+
+				std::cin >> employeeNumber;
+			
+				if (std::cin.fail() || employeeNumber < minEmployeeNumber || employeeNumber > maxEmployeeNumber) {
+					std::cout << "Invalid number format! Employee Number must be in 5-digit format(e.g 10001)!\n";
+					std::cout << "Try again: ";
+					std::cin.clear();
+					std::cin.ignore();
+					continue;
+				}
+
 				if (MyCompany.EmployeeNumberExists(employeeNumber)) {
 					std::cout << "Employee Number already exist!\n";
 					std::cout << "Enter another number: ";
@@ -158,10 +178,21 @@ int main() {
 
 				break;
 			}
+			//This validates that the salary is entere in the correct format
+			std::cout << "\nEnter salary of employee: \n";
+			while (true) {
+				std::cin >> salary;
+				if (std::cin.fail() || salary <= 0) {
+					std::cout << "Invalid value!\n";
+					std::cout << "Try again: ";
+					std::cin.clear();
+					std::cin.ignore();
+					continue;
+				}
 
-			std::cout << "Enter salary of employee: \n";
-			std::cin >> salary;
-			std::cout << "\n\n";
+				std::cout << "\n\n";
+				break;
+			}
 
 			std::cout << "Appointing employee...\n";
 			std::cout << "Employee successfully appointed!\n\n";
@@ -170,13 +201,40 @@ int main() {
 			break;
 
 		case 2:
+			if (MyCompany.GetNumberEmployees() <= 0) {
+				std::cout << "\nCurrently there are no employees working in the company!\n\n";
+				break;
+			}
+
+			//This validates the format of employeeNumber
 			std::cout << "Enter Employee Number(e.g 10001) of the employee that you want discharged: \n";
-			std::cin >> employeeNumber;
+			while (true) {
+				std::cin >> employeeNumber;
+				if (std::cin.fail() || employeeNumber < minEmployeeNumber || employeeNumber > maxEmployeeNumber) {
+					std::cout << "Invalid number format! Employee Number must be in 5-digit format(e.g 10001)!\n";
+					std::cout << "Try again: ";
+					std::cin.clear();
+					std::cin.ignore();
+					continue;
+				}
+				if (!MyCompany.EmployeeNumberExists(employeeNumber)) {
+					std::cout << "Employee Number does not exist!\n";
+					std::cout << "Try again: \n";
+					continue;
+				}
+
+				break;
+			}
+
+
+
 			MyCompany.DischargeEmployee(employeeNumber);
+			std::cout << "\nDischarging employee...\n";
+			std::cout << "Employee successfully discharged!\n\n";
 			break;
 
 		case 3:
-			std::cout << "List of employees: \n";
+			std::cout << "\nList of employees: \n";
 			std::cout << "------------------\n";
 			if (MyCompany.GetNumberEmployees() == 0) {
 				std::cout << "\nCurrently there are no employees working in the company!\n\n";
