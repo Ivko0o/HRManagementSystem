@@ -1,6 +1,10 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <string>
+
+const int minEmployeeNumber = 10000;
+const int maxEmployeeNumber = 99999;
 
 
 class Employee {
@@ -30,8 +34,7 @@ public:
 	}
 
 	void DisplayDetails() const {
-		std::cout << "\nEmployee Details\n";
-		std::cout << "-------------------\n";
+		std::cout << "Employee Details : \n";
 		std::cout << "Name: " << name << "\n";
 		std::cout << "Position: " << position << "\n";
 		std::cout << "Age: " << age << "\n";
@@ -56,6 +59,13 @@ public:
 		Employee EmployeeObj(n, p, a, e, s);
 		listEmployees.push_back(EmployeeObj);
 		numberEmployees++;
+	}
+
+	bool EmployeeNumberExists(int empNum) const {
+		return std::any_of(listEmployees.begin(), listEmployees.end(),
+			[empNum](const Employee& employee) {
+				return employee.getEmpNum() == empNum;
+			});
 	}
 
 	void DischargeEmployee(int empNum) {
@@ -131,8 +141,24 @@ int main() {
 			std::getline(std::cin, position);
 			std::cout << "Enter age of employee: \n";
 			std::cin >> age;
+
 			std::cout << "Enter employee number(e.g 10001): \n";
-			std::cin >> employeeNumber;
+			while (true) {
+				std::cin >> employeeNumber;
+				if ((employeeNumber < minEmployeeNumber || employeeNumber > maxEmployeeNumber)) {
+					std::cout << "Invalid number format! Number must be in 5-digit format(e.g 10001)!\n";
+					std::cout << "Try again: ";
+					continue;
+				}
+				if (MyCompany.EmployeeNumberExists(employeeNumber)) {
+					std::cout << "Employee Number already exist!\n";
+					std::cout << "Enter another number: ";
+					continue;
+				}
+
+				break;
+			}
+
 			std::cout << "Enter salary of employee: \n";
 			std::cin >> salary;
 			std::cout << "\n\n";
@@ -144,12 +170,14 @@ int main() {
 			break;
 
 		case 2:
-			std::cout << "Enter Employee Number(e.g 10001) of the employee that you want removed: \n";
+			std::cout << "Enter Employee Number(e.g 10001) of the employee that you want discharged: \n";
 			std::cin >> employeeNumber;
 			MyCompany.DischargeEmployee(employeeNumber);
 			break;
 
 		case 3:
+			std::cout << "List of employees: \n";
+			std::cout << "------------------\n";
 			if (MyCompany.GetNumberEmployees() == 0) {
 				std::cout << "\nCurrently there are no employees working in the company!\n\n";
 				break;
